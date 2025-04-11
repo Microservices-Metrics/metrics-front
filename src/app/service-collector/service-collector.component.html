@@ -1,0 +1,25 @@
+<main class="container">
+  <div class="bg-body-tertiary p-5 rounded mt-3">
+    <h1>New service collector</h1>
+    <p class="lead">
+      A service collector is an application that gather information given a
+      specific metric
+    </p>
+    <form>
+      <div class="mb-3">
+        <label for="serviceName" class="form-label">Service Name</label>
+        <input type="text" class="form-control" />
+      </div>
+      <!-- TODO: metric type must be a combo filled with values fetched from API -->
+      <div class="mb-3">
+        <label class="form-label">Metric Type</label>
+        <input type="text" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">URL</label>
+        <input type="text" class="form-control" />
+      </div>
+      <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+  </div>
+</main>
