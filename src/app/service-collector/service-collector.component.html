@@ -5,10 +5,10 @@
       A service collector is an application that gather information given a
       specific metric
     </p>
-    <form>
+    <form [formGroup]="serviceCollectorForm" (ngSubmit)="onSubmit()">
       <div class="mb-3">
         <label for="serviceName" class="form-label">Service Name</label>
-        <input type="text" class="form-control" />
+        <input type="text" class="form-control" formControlName="serviceName"/>
       </div>
       <!-- TODO: metric type must be a combo filled with values fetched from API -->
       <div class="mb-3">
@@ -19,7 +19,19 @@
         <label class="form-label">URL</label>
         <input type="text" class="form-control" />
       </div>
-      <button type="submit" class="btn btn-primary">Register</button>
+      <div class="mb-3">
+        <label class="form-label">Output Format</label>
+        <input type="text" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Output Description</label>
+        <input type="text" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Output Example</label>
+        <input type="code" class="form-control" />
+      </div>
+      <button type="submit" class="btn btn-primary" [disabled]="!serviceCollectorForm.valid">Register</button>
     </form>
   </div>
 </main>
