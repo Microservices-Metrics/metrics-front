@@ -24,6 +24,7 @@ export class ServiceCollectorComponent {
   
   onSubmit() {
     if (this.serviceCollectorForm.valid) {
+      // TODO: remover após requisição construída!
       console.log('Dados do Formulário:', this.serviceCollectorForm.value);
       console.log("==============================");
       console.log(this.managetApiService.getCollectors());
