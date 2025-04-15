@@ -10,26 +10,26 @@
         <label for="serviceName" class="form-label">Service Name</label>
         <input type="text" class="form-control" formControlName="serviceName"/>
       </div>
-      <!-- TODO: metric type must be a combo filled with values fetched from API -->
+      <!-- TODO: collector type must be a combo filled with values fetched from API -->
       <div class="mb-3">
-        <label class="form-label">Metric Type</label>
-        <input type="text" class="form-control" />
+        <label class="form-label">Collector Type</label>
+        <input type="text" class="form-control" formControlName="collectorType"/>
       </div>
       <div class="mb-3">
         <label class="form-label">URL</label>
-        <input type="text" class="form-control" />
+        <input type="text" class="form-control" formControlName="url"/>
       </div>
       <div class="mb-3">
-        <label class="form-label">Output Format</label>
-        <input type="text" class="form-control" />
+        <label class="form-label">Measurement Format</label>
+        <input type="text" class="form-control" formControlName="measurementFormat"/>
       </div>
       <div class="mb-3">
-        <label class="form-label">Output Description</label>
-        <input type="text" class="form-control" />
+        <label class="form-label">Measurement Description</label>
+        <input type="text" class="form-control" formControlName="measurementDescription"/>
       </div>
       <div class="mb-3">
         <label class="form-label">Output Example</label>
-        <input type="code" class="form-control" />
+        <input type="code" class="form-control" formControlName="outputExample"/>
       </div>
       <button type="submit" class="btn btn-primary" [disabled]="!serviceCollectorForm.valid">Register</button>
     </form>
