@@ -20,4 +20,8 @@ export class ManagerApiService {
       })
     );
   }
+
+  postCollector(serviceCollectorData: any) {
+    return this.http.post(this.managerApiUrl, serviceCollectorData);
+  }
 }
