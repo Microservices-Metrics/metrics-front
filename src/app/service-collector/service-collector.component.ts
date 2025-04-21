@@ -31,7 +31,7 @@ export class ServiceCollectorComponent {
     });
   }
 
-  onInit() {
+  ngOnInit() {
     this.managerApiService.getCollectors().subscribe({
       next: (data) => {
         this.currentServiceCollectors = data;

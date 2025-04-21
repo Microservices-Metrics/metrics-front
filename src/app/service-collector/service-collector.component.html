@@ -2,7 +2,7 @@
   <div class="bg-body-tertiary p-5 rounded mt-3">
     <h1>Service Collector</h1>
     <p class="lead">
-      A service collector is an application that gather information given a
+      A service collector is an application that get metrics given a
       specific metric
     </p>
 
@@ -39,6 +39,7 @@
             <input type="code" class="form-control" formControlName="outputExample" />
           </div>
           <button type="submit" class="btn btn-primary" [disabled]="!serviceCollectorForm.valid">Register</button>
+          <button type="button" class="btn" aria-label="Close" (click)="modal.dismiss()">Close</button>
         </form>
       </div>
     </ng-template>
