@@ -2,8 +2,8 @@
   <div class="bg-body-tertiary p-5 rounded mt-3">
     <h1>Service Collector</h1>
     <p class="lead">
-      A service collector is an application that get metrics given a
-      specific metric
+      A service collector is an application that get metrics given a specific
+      metric
     </p>
 
     <button class="btn btn-primary" (click)="openModal()">New Collector</button>
@@ -11,16 +11,24 @@
     <ng-template #modalContent let-modal>
       <div class="bg-body-tertiary p-5 rounded mt-1">
         <h1>New Service Collector</h1>
-        <br>
+        <br />
         <form [formGroup]="serviceCollectorForm" (ngSubmit)="onSubmit()">
           <div class="mb-3">
             <label for="serviceName" class="form-label">Service Name</label>
-            <input type="text" class="form-control" formControlName="serviceName" />
+            <input
+              type="text"
+              class="form-control"
+              formControlName="serviceName"
+            />
           </div>
           <!-- TODO: collector type must be a combo filled with values fetched from API -->
           <div class="mb-3">
             <label class="form-label">Collector Type</label>
-            <input type="text" class="form-control" formControlName="collectorType" />
+            <input
+              type="text"
+              class="form-control"
+              formControlName="collectorType"
+            />
           </div>
           <div class="mb-3">
             <label class="form-label">URL</label>
@@ -28,34 +36,80 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Measurement Format</label>
-            <input type="text" class="form-control" formControlName="measurementFormat" />
+            <input
+              type="text"
+              class="form-control"
+              formControlName="measurementFormat"
+            />
           </div>
           <div class="mb-3">
             <label class="form-label">Measurement Description</label>
-            <input type="text" class="form-control" formControlName="measurementDescription" />
+            <input
+              type="text"
+              class="form-control"
+              formControlName="measurementDescription"
+            />
           </div>
           <div class="mb-3">
             <label class="form-label">Output Example</label>
-            <input type="code" class="form-control" formControlName="outputExample" />
+            <input
+              type="code"
+              class="form-control"
+              formControlName="outputExample"
+            />
           </div>
-          <button type="submit" class="btn btn-primary" [disabled]="!serviceCollectorForm.valid">Register</button>
-          <button type="button" class="btn" aria-label="Close" (click)="modal.dismiss()">Close</button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!serviceCollectorForm.valid"
+          >
+            Register
+          </button>
+          <button
+            type="button"
+            class="btn"
+            aria-label="Close"
+            (click)="modal.dismiss()"
+          >
+            Close
+          </button>
         </form>
       </div>
     </ng-template>
   </div>
-
+  <br />
   <div class="bg-body-tertiary" *ngIf="currentServiceCollectors.length > 0">
-    <thead>
-      <tr>
-        <th>Service Name</th>
-        <th>Collector Type</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let collector of currentServiceCollectors">
-        <!-- TODO: ver nomes do Json -->
-      </tr>
-    </tbody>
+    <table class="table table-stripped-columns table-hover">
+      <thead>
+        <tr>
+          <th>Service ID</th>
+          <th>Service Name</th>
+          <th>Collector Type</th>
+          <th>URL</th>
+          <th>Metric Format</th>
+          <th>Metric Description</th>
+          <th>Output Example</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let collector of currentServiceCollectors">
+          <td>{{ collector.idService }}</td>
+          <td>{{ collector.name }}</td>
+          <td>{{ collector.type }}</td>
+          <td>{{ collector.url }}</td>
+          <td>{{ collector.metricFormat }}</td>
+          <td>{{ collector.metricDescription }}</td>
+          <td>{{ collector.outputExample }}</td>
+          <td>
+            <div class="d-flex gap-1">
+              <button class="btn btn-outline-primary">Run</button>
+              <button class="btn btn-outline-success">History</button>
+              <button class="btn btn-outline-danger">Delete</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </main>
