@@ -15,20 +15,12 @@
         <form [formGroup]="serviceCollectorForm" (ngSubmit)="onSubmit()">
           <div class="mb-3">
             <label for="serviceName" class="form-label">Service Name</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="serviceName"
-            />
+            <input type="text" class="form-control" formControlName="serviceName" />
           </div>
           <!-- TODO: collector type must be a combo filled with values fetched from API -->
           <div class="mb-3">
             <label class="form-label">Collector Type</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="collectorType"
-            />
+            <input type="text" class="form-control" formControlName="collectorType" />
           </div>
           <div class="mb-3">
             <label class="form-label">URL</label>
@@ -36,41 +28,20 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Measurement Format</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="measurementFormat"
-            />
+            <input type="text" class="form-control" formControlName="measurementFormat" />
           </div>
           <div class="mb-3">
             <label class="form-label">Measurement Description</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="measurementDescription"
-            />
+            <input type="text" class="form-control" formControlName="measurementDescription" />
           </div>
           <div class="mb-3">
             <label class="form-label">Output Example</label>
-            <input
-              type="code"
-              class="form-control"
-              formControlName="outputExample"
-            />
+            <input type="code" class="form-control" formControlName="outputExample" />
           </div>
-          <button
-            type="submit"
-            class="btn btn-primary"
-            [disabled]="!serviceCollectorForm.valid"
-          >
+          <button type="submit" class="btn btn-primary" [disabled]="!serviceCollectorForm.valid">
             Register
           </button>
-          <button
-            type="button"
-            class="btn"
-            aria-label="Close"
-            (click)="modal.dismiss()"
-          >
+          <button type="button" class="btn" aria-label="Close" (click)="modal.dismiss()">
             Close
           </button>
         </form>
@@ -103,7 +74,7 @@
           <td>{{ collector.outputExample }}</td>
           <td>
             <div class="d-flex gap-1">
-              <button class="btn btn-outline-primary">Run</button>
+              <button class="btn btn-outline-primary" (click)="openModalRunService()">Run</button>
               <button class="btn btn-outline-success">History</button>
               <button class="btn btn-outline-danger">Delete</button>
             </div>
@@ -111,5 +82,18 @@
         </tr>
       </tbody>
     </table>
+
+    <ng-template #modalRunService let-modal>
+      <div class="bg-body-tertiary p-5 rounded mt-1">
+        <h1>Run Service Collector</h1>
+        <br />
+        <form>
+          <div class="mb-3">
+            <label for="payload" class="form-label">Payload</label>
+            <input type="text" class="form-control" formControlName="payload" />
+          </div>
+        </form>
+      </div>
+    </ng-template>
   </div>
 </main>

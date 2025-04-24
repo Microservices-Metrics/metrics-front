@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 })
 export class ServiceCollectorComponent {
   @ViewChild('modalContent') modalContent: any;
+  @ViewChild('modalRunService') modalRunService: any;
 
   currentServiceCollectors: any[] = [];
   serviceCollectorForm: FormGroup;
@@ -44,8 +45,6 @@ export class ServiceCollectorComponent {
 
   onSubmit() {
     if (this.serviceCollectorForm.valid) {
-      // console.log('Dados do Formulário:', this.serviceCollectorForm.value);
-
       this.managerApiService.postCollector(this.serviceCollectorForm.value).subscribe({
         next: () => {
           this.serviceCollectorForm.reset();
@@ -60,6 +59,17 @@ export class ServiceCollectorComponent {
 
   openModal() {
     this.modalService.open(this.modalContent, { ariaLabelledBy: 'modal-basic-title' }).result.then(
+      (result) => {
+        console.log(`Modal fechado com: ${result}`);
+      },
+      (reason) => {
+        console.log(`Modal descartado: ${reason}`);
+      }
+    );
+  }
+
+  openModalRunService() {
+    this.modalService.open(this.modalRunService, { ariaLabelledBy: 'modal-basic-title' }).result.then(
       (result) => {
         console.log(`Modal fechado com: ${result}`);
       },
