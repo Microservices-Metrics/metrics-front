@@ -7,7 +7,7 @@ import { catchError, Observable, of } from 'rxjs';
 })
 export class ManagerApiService {
   error: string | null = null;
-  
+
   private managerApiUrl = "http://localhost:8080/services";
 
   constructor(private http: HttpClient) { }
@@ -22,6 +22,11 @@ export class ManagerApiService {
   }
 
   postCollector(serviceCollectorData: any) {
-    return this.http.post(this.managerApiUrl, serviceCollectorData);
+    return this.http.post(this.managerApiUrl, serviceCollectorData).pipe(
+      catchError((err) => {
+        this.error = "Erro ao registrar novo serviço!";
+        return of(null);
+      })
+    );
   }
 }
