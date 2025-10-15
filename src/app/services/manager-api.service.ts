@@ -22,6 +22,15 @@ export class ManagerApiService {
     );
   }
 
+  getCollectorById(idService: string): Observable<any> {
+    return this.http.get<any>(`${this.servicesEndpoint}/${idService}`).pipe(
+      catchError((err) => {
+        this.error = `Erro ao carregar coletor ${idService}!`;
+        return of(null);
+      })
+    );
+  }
+
   postCollector(serviceCollectorData: any) {
     return this.http.post(this.servicesEndpoint, serviceCollectorData).pipe(
       catchError((err) => {
@@ -38,5 +47,5 @@ export class ManagerApiService {
         return of(null);
       })
     );
-  }
+  }  
 }

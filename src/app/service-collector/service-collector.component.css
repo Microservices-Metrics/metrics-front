@@ -1,0 +1,46 @@
+.details-btn {
+	font-size: 18px;
+	color: #0d6efd;
+	padding: 0.15rem 0.4rem;
+	line-height: 1;
+}
+
+.details-btn:hover {
+	color: #0b5ed7;
+}
+
+.arg-card {
+	border-left: 4px solid rgba(13,110,253,0.9);
+	background-color: #f8fbff;
+	padding: 0.5rem 0.75rem;
+	border-radius: 0.25rem;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.arg-card .row > div {
+	margin-bottom: 0.25rem;
+}
+
+.arg-card .row > div {
+	min-width: 0; 
+}
+
+.arg-card .row > div strong {
+	display: block;
+	margin-bottom: 0.25rem;
+}
+
+.arg-card .row > div div {
+	white-space: normal;
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
+.arg-card {
+	font-size: 0.8rem;
+}
+.arg-card .row > div strong {
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+

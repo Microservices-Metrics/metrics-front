@@ -270,7 +270,7 @@
               <th scope="row">Arguments</th>
               <td>
                 <div *ngIf="selectedCollectorDetails?.arguments?.length > 0; else noArgs">
-                  <div *ngFor="let arg of selectedCollectorDetails.arguments" class="card mb-2 p-2">
+                  <div *ngFor="let arg of selectedCollectorDetails.arguments" class="arg-card mb-2">
                     <div class="row">
                       <div class="col-12 col-md-3"><strong>Name</strong><div>{{ arg.argumentName || arg.name || '-' }}</div></div>
                       <div class="col-12 col-md-2"><strong>Type</strong><div>{{ arg.type || '-' }}</div></div>

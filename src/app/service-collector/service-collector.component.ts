@@ -196,13 +196,53 @@ export class ServiceCollectorComponent {
   }
 
   openHistory(collector: any) {
-    this.selectedExecutions = Array.isArray(collector?.executions) ? collector.executions : [];
-    this.selectedServiceId = collector?.idService ?? null;
-    this.selectedServiceName = collector?.name ?? '';
-    this.modalService.open(this.modalHistory, { size: 'xl' }).result.then(
-      (result: any) => console.log('History modal closed', result),
-      (reason: any) => console.log('History modal dismissed', reason)
-    );
+    const id = collector?.idService ?? collector?.id ?? null;
+    if (!id) {
+      // fallback to existing data if no id available
+      this.selectedExecutions = Array.isArray(collector?.executions) ? collector.executions : [];
+      this.selectedServiceId = collector?.idService ?? null;
+      this.selectedServiceName = collector?.name ?? '';
+
+      this.modalService.open(this.modalHistory, { size: 'xl' }).result.then(
+        (result: any) => console.log('History modal closed', result),
+        (reason: any) => console.log('History modal dismissed', reason)
+      );
+
+      return;
+    }
+
+    // fetch latest collector by id to have up-to-date executions
+    this.managerApiService.getCollectorById(String(id)).subscribe({
+      next: (freshCollector) => {
+        const executions = Array.isArray(freshCollector?.executions) ? freshCollector.executions : (Array.isArray(collector?.executions) ? collector.executions : []);
+        this.selectedExecutions = executions;
+        this.selectedServiceId = freshCollector?.idService ?? freshCollector?.id ?? id;
+        this.selectedServiceName = freshCollector?.name ?? collector?.name ?? '';
+
+        // atualizar o coletor em currentServiceCollectors para que reflita as últimas execuções
+        const idx = this.currentServiceCollectors.findIndex(c => (c.idService ?? c.id) == (freshCollector?.idService ?? freshCollector?.id ?? id));
+        if (idx !== -1) {
+          // merge para preservar outros campos mas atualizar execuções
+          this.currentServiceCollectors[idx] = { ...this.currentServiceCollectors[idx], ...freshCollector };
+        }
+
+        this.modalService.open(this.modalHistory, { size: 'xl' }).result.then(
+          (result: any) => console.log('History modal closed', result),
+          (reason: any) => console.log('History modal dismissed', reason)
+        );
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar coletor para histórico:', err);
+
+        this.selectedExecutions = Array.isArray(collector?.executions) ? collector.executions : [];
+        this.selectedServiceId = collector?.idService ?? null;
+        this.selectedServiceName = collector?.name ?? '';
+        this.modalService.open(this.modalHistory, { size: 'xl' }).result.then(
+          (result: any) => console.log('History modal closed', result),
+          (reason: any) => console.log('History modal dismissed', reason)
+        );
+      }
+    });
   }
 
   openDetails(collector: any) {
