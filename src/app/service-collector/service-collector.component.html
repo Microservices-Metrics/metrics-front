@@ -2,8 +2,7 @@
   <div class="bg-body-tertiary p-5 rounded mt-3">
     <h1>Service Collector</h1>
     <p class="lead">
-      A service collector is an application that get metrics given a specific
-      metric
+      A service collector is an application that get metrics
     </p>
 
     <button class="btn btn-primary" (click)="openModal()">New Collector</button>
@@ -15,40 +14,177 @@
         <form [formGroup]="serviceCollectorForm" (ngSubmit)="onSubmit()">
           <div class="mb-3">
             <label for="serviceName" class="form-label">Service Name</label>
-            <input type="text" class="form-control" formControlName="serviceName" />
+            <input type="text" class="form-control" formControlName="name" />
           </div>
           <!-- TODO: collector type must be a combo filled with values fetched from API -->
           <div class="mb-3">
             <label class="form-label">Collector Type</label>
-            <input type="text" class="form-control" formControlName="collectorType" />
+            <input type="text" class="form-control" formControlName="type" />
           </div>
           <div class="mb-3">
             <label class="form-label">URL</label>
             <input type="text" class="form-control" formControlName="url" />
           </div>
           <div class="mb-3">
-            <label class="form-label">Measurement Format</label>
-            <input type="text" class="form-control" formControlName="measurementFormat" />
+            <label class="form-label">Metric Format</label>
+            <input type="text" class="form-control" formControlName="metricFormat" />
           </div>
           <div class="mb-3">
-            <label class="form-label">Measurement Description</label>
-            <input type="text" class="form-control" formControlName="measurementDescription" />
+            <label class="form-label">Metric Description</label>
+            <input type="text" class="form-control" formControlName="metricDescription" />
           </div>
-          <div class="mb-3">
-            <label class="form-label">Output Example</label>
-            <input type="code" class="form-control" formControlName="outputExample" />
+
+          <fieldset formGroupName="collectionSettings" class="mb-3">
+            <legend>Collection Settings</legend>
+            <div class="form-text small mb-3">
+              Collection settings are optional. If filled in, they will be used to schedule the collection. Example of
+              cron (every 1h): <code>0 0 * * * *</code>.
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Cron Expression</label>
+              <input type="text" class="form-control" formControlName="cronExpression" placeholder="0 0 * * * *" />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Start Date</label>
+              <input type="date" class="form-control" formControlName="startDate" />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">End Date</label>
+              <input type="date" class="form-control" formControlName="endDate" />
+            </div>
+          </fieldset>
+
+
+          <div formArrayName="arguments" class="mb-3">
+            <!-- <label class="form-label">Arguments</label> -->
+            <legend>Arguments</legend>
+            <div *ngFor="let arg of arguments.controls; let i = index" [formGroupName]="i" class="card p-3 mb-2">
+              <div class="row g-2 align-items-center">
+                <div class="col-12 col-md-8">
+                  <label class="form-label mb-1">Name</label>
+                  <input class="form-control" placeholder="Argument Name" formControlName="argumentName" />
+                </div>
+                <div class="col-12 col-md-4">
+                  <label class="form-label mb-1">Type</label>
+                  <select class="form-select" formControlName="type">
+                    <option value="boolean">boolean</option>
+                    <option value="date">date</option>
+                    <option value="double">double</option>
+                    <option value="integer">integer</option>
+                    <option value="string">string</option>
+                  </select>
+                </div>
+                <div class="col-12 mt-2">
+                  <label class="form-label mb-1">Value</label>
+                  <input class="form-control" placeholder="Argument Value" formControlName="argumentValue" />
+                </div>
+                <div class="col-12 mt-2">
+                  <label class="form-label mb-1">Description</label>
+                  <input class="form-control" placeholder="Description" formControlName="description" />
+                  <div class="d-flex justify-content-end mt-2">
+                    <button type="button" class="btn btn-danger" (click)="removeArgument(i)">Remove Argument</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline-primary" (click)="addArgument()">Add Argument</button>
           </div>
-          <button type="submit" class="btn btn-primary" [disabled]="!serviceCollectorForm.valid">
-            Register
-          </button>
-          <button type="button" class="btn" aria-label="Close" (click)="modal.dismiss()">
-            Close
-          </button>
+          <div class="d-flex justify-content-between mt-3">
+            <button type="button" class="btn btn-outline-primary" aria-label="Close" (click)="modal.dismiss()">
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="!serviceCollectorForm.valid">
+              Register
+            </button>
+          </div>
         </form>
       </div>
     </ng-template>
   </div>
+
+  <ng-template #modalHistory let-modal>
+    <div class="bg-body-tertiary p-3 rounded">
+      <h3>Executions History</h3>
+      <p>Total executions: <strong>{{ selectedExecutions.length }}</strong> for service <strong>{{ selectedServiceName
+          }}</strong>
+        (Service ID: {{ selectedServiceId }})</p>
+      <div *ngIf="selectedExecutions.length > 0; else noExec" class="small">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Execution ID</th>
+              <th>Http Status</th>
+              <th>Started At</th>
+              <th>Finished At</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let execution of selectedExecutions">
+              <td>{{ execution.idExecution }}</td>
+              <td>{{ execution.responseStatus }}</td>
+              <td>{{ execution.startDateTime | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ execution.endDateTime | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <pre class="mb-0"
+                  style="white-space: pre-wrap; word-break: break-word;">{{ execution.responseBody | json }}</pre>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noExec>
+        <p class="text-muted">No executions available for this service.</p>
+      </ng-template>
+      <div class="text-end">
+        <button class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #modalRunService let-modal>
+    <div class="bg-body-tertiary p-3 rounded">
+      <h3>Execution Result</h3>
+      <div *ngIf="selectedExecutionDetails; else noDetails" class="small">
+        <table class="table table-sm">
+          <tbody>
+            <tr>
+              <th scope="row">Execution ID</th>
+              <td>{{ selectedExecutionDetails?.idExecution ?? '-' }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Status</th>
+              <td>{{ selectedExecutionDetails?.responseStatus ?? '-' }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Started At</th>
+              <td>{{ selectedExecutionDetails?.startDateTime | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Finished At</th>
+              <td>{{ selectedExecutionDetails?.endDateTime | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Details</th>
+              <td>
+                <pre class="mb-0"
+                  style="white-space: pre-wrap; word-break: break-word;">{{ selectedExecutionDetails?.responseBody | json }}</pre>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noDetails>
+        <p class="text-muted">No execution details available.</p>
+      </ng-template>
+      <div class="text-end">
+        <button class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+      </div>
+    </div>
+  </ng-template>
+
   <br />
+
   <div class="bg-body-tertiary" *ngIf="currentServiceCollectors.length > 0">
     <table class="table table-stripped-columns table-hover">
       <thead>
@@ -59,41 +195,104 @@
           <th>URL</th>
           <th>Metric Format</th>
           <th>Metric Description</th>
-          <th>Output Example</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let collector of currentServiceCollectors">
-          <td>{{ collector.idService }}</td>
+          <td class="d-flex align-items-center gap-2">
+            <a href="#" class="link-primary" (click)="openDetails(collector); $event.preventDefault()">{{ collector.idService }}</a>
+            <!-- <button class="btn btn-outline-info btn-sm" title="Details" (click)="openDetails(collector)" aria-label="Details">ⓘ</button> -->
+          </td>
           <td>{{ collector.name }}</td>
           <td>{{ collector.type }}</td>
           <td>{{ collector.url }}</td>
           <td>{{ collector.metricFormat }}</td>
           <td>{{ collector.metricDescription }}</td>
-          <td>{{ collector.outputExample }}</td>
           <td>
             <div class="d-flex gap-1">
-              <button class="btn btn-outline-primary" (click)="openModalRunService()">Run</button>
-              <button class="btn btn-outline-success">History</button>
-              <button class="btn btn-outline-danger">Delete</button>
+              <button class="btn btn-outline-primary" (click)="runServiceCollector(collector.idService)">Run</button>
+              <button class="btn btn-outline-success" (click)="openHistory(collector)">History</button>
+              <button class="btn btn-outline-danger"
+                (click)="deleteServiceCollector(collector.idService)">Delete</button>
             </div>
           </td>
         </tr>
       </tbody>
     </table>
-
-    <ng-template #modalRunService let-modal>
-      <div class="bg-body-tertiary p-5 rounded mt-1">
-        <h1>Run Service Collector</h1>
-        <br />
-        <form>
-          <div class="mb-3">
-            <label for="payload" class="form-label">Payload</label>
-            <input type="text" class="form-control" formControlName="payload" />
-          </div>
-        </form>
-      </div>
-    </ng-template>
   </div>
+
+  <ng-template #modalDetails let-modal>
+    <div class="bg-body-tertiary p-3 rounded">
+      <h3>Collector Details</h3>
+      <div *ngIf="selectedCollectorDetails; else noCollector" class="small">
+        <table class="table table-sm">
+          <tbody>
+            <tr>
+              <th scope="row">Service ID</th>
+              <td>{{ selectedCollectorDetails?.idService }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Name</th>
+              <td>{{ selectedCollectorDetails?.name }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Type</th>
+              <td>{{ selectedCollectorDetails?.type }}</td>
+            </tr>
+            <tr>
+              <th scope="row">URL</th>
+              <td>{{ selectedCollectorDetails?.url }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Metric Format</th>
+              <td>{{ selectedCollectorDetails?.metricFormat }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Metric Description</th>
+              <td>{{ selectedCollectorDetails?.metricDescription }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Output Example</th>
+              <td>
+                <pre class="mb-0"
+                  style="white-space: pre-wrap; word-break: break-word;">{{ selectedCollectorDetails?.outputExample }}</pre>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Collection Settings</th>
+              <td>
+                <pre class="mb-0"
+                  style="white-space: pre-wrap; word-break: break-word;">{{ selectedCollectorDetails?.collectionSettings | json }}</pre>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Arguments</th>
+              <td>
+                <div *ngIf="selectedCollectorDetails?.arguments?.length > 0; else noArgs">
+                  <div *ngFor="let arg of selectedCollectorDetails.arguments" class="card mb-2 p-2">
+                    <div class="row">
+                      <div class="col-12 col-md-3"><strong>Name</strong><div>{{ arg.argumentName || arg.name || '-' }}</div></div>
+                      <div class="col-12 col-md-2"><strong>Type</strong><div>{{ arg.type || '-' }}</div></div>
+                      <div class="col-12 col-md-4"><strong>Value</strong><div>{{ arg.argumentValue || arg.value || '-' }}</div></div>
+                      <div class="col-12 col-md-3"><strong>Description</strong><div>{{ arg.description || '-' }}</div></div>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #noArgs>
+                  <p class="text-muted mb-0">No arguments defined for this collector.</p>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noCollector>
+        <p class="text-muted">No collector details available.</p>
+      </ng-template>
+      <div class="text-end">
+        <button class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+      </div>
+    </div>
+  </ng-template>
 </main>
