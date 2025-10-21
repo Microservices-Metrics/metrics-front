@@ -1,0 +1,33 @@
+<main class="container">
+  <div class="bg-body-tertiary p-5 rounded mt-3">
+    <h1>Microservices</h1>
+    <p class="lead">
+      A microservice is an application that runs its own process as a service and communicates via lightweight
+      mechanisms. Here you register your microservices to collect metrics from them.
+    </p>
+
+    <button class="btn btn-primary" (click)="openModal()">New Microservice</button>
+
+    <ng-template #modalContent let-modal>
+      <div class="bg-body-tertiary p-5 rounded mt-1">
+        <h1>New Microservice</h1>
+        <br />
+        <form [formGroup]="microserviceForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" formControlName="name"
+              placeholder="Enter microservice name" />
+          </div>
+          <div class="mb-3">
+            <label for="url" class="form-label">URL</label>
+            <input type="text" class="form-control" id="url" formControlName="url"
+              placeholder="Enter microservice URL" />
+          </div>
+          <button type="submit" class="btn btn-primary" [disabled]="microserviceForm.invalid">
+            Register Microservice
+          </button>
+        </form>
+      </div>
+    </ng-template>
+  </div>
+</main>
