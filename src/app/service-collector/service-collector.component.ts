@@ -180,7 +180,7 @@ export class ServiceCollectorComponent {
       next: (response) => {
         console.log('Coletor de serviços iniciado com sucesso:', response);
         this.selectedExecutionDetails = response;
-        // open modal to show the execution details
+
         this.modalService.open(this.modalRunService, { size: 'lg' }).result.then(
           (res) => console.log('Run modal closed', res),
           (reason) => console.log('Run modal dismissed', reason)
@@ -190,15 +190,12 @@ export class ServiceCollectorComponent {
         console.error('Erro ao iniciar coletor de serviços:', err);
       }
     });
-
-
-
   }
 
   openHistory(collector: any) {
     const id = collector?.idService ?? collector?.id ?? null;
     if (!id) {
-      // fallback to existing data if no id available
+      // fallback para dados existentes se nenhum idService estiver disponível
       this.selectedExecutions = Array.isArray(collector?.executions) ? collector.executions : [];
       this.selectedServiceId = collector?.idService ?? null;
       this.selectedServiceName = collector?.name ?? '';
@@ -211,7 +208,7 @@ export class ServiceCollectorComponent {
       return;
     }
 
-    // fetch latest collector by id to have up-to-date executions
+    // busca o coletor mais recente pelo id para ter execuções atualizadas
     this.managerApiService.getCollectorById(String(id)).subscribe({
       next: (freshCollector) => {
         const executions = Array.isArray(freshCollector?.executions) ? freshCollector.executions : (Array.isArray(collector?.executions) ? collector.executions : []);
@@ -246,9 +243,32 @@ export class ServiceCollectorComponent {
   }
 
   openDetails(collector: any) {
-    // clone collector without executions to avoid accidental mutation
+    // clona o coletor sem execuções para evitar mutação acidental
     const { executions, ...rest } = collector || {};
     this.selectedCollectorDetails = rest;
     this.modalService.open(this.modalDetails, { size: 'lg' });
+  }
+
+  // auxiliares para manipular responseBody que pode ser uma string JSON ou um objeto
+  getResponseObject(body: any): any | null {
+    if (body == null) return null;
+    if (typeof body === 'object') return body;
+    if (typeof body === 'string') {
+      try {
+        return JSON.parse(body);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  isObject(value: any): boolean {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  objectEntries(obj: any): Array<{ key: string; value: any }> {
+    if (!obj || typeof obj !== 'object') return [];
+    return Object.keys(obj).map(k => ({ key: k, value: obj[k] }));
   }
 }

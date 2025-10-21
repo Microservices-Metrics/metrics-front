@@ -44,3 +44,7 @@
 	font-weight: 600;
 }
 
+.resp-section > strong {
+	font-size: 1.2rem;
+	color: #212529;
+}

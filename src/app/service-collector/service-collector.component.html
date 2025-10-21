@@ -1,15 +1,16 @@
 <main class="container">
   <div class="bg-body-tertiary p-5 rounded mt-3">
-    <h1>Service Collector</h1>
+    <h1>Metric Collector</h1>
     <p class="lead">
-      A service collector is an application that get metrics
+      A metric collector is an application that get metrics from a specific microservice endpoint and sends them to the central
+      metrics repository.
     </p>
 
     <button class="btn btn-primary" (click)="openModal()">New Collector</button>
 
     <ng-template #modalContent let-modal>
       <div class="bg-body-tertiary p-5 rounded mt-1">
-        <h1>New Service Collector</h1>
+        <h1>New Metric Collector</h1>
         <br />
         <form [formGroup]="serviceCollectorForm" (ngSubmit)="onSubmit()">
           <div class="mb-3">
@@ -126,8 +127,27 @@
               <td>{{ execution.startDateTime | date:'dd/MM/yyyy HH:mm' }}</td>
               <td>{{ execution.endDateTime | date:'dd/MM/yyyy HH:mm' }}</td>
               <td>
-                <pre class="mb-0"
-                  style="white-space: pre-wrap; word-break: break-word;">{{ execution.responseBody | json }}</pre>
+                <ng-container *ngIf="getResponseObject(execution.responseBody) as respObj; else rawBody">
+                  <div class="mb-2">
+                    <div *ngFor="let section of objectEntries(respObj)" [ngClass]="{'arg-card': true, 'resp-section': true, 'metric': section.key === 'metric', 'measurement': section.key === 'measurement'}" class="mb-2">
+                      <strong class="d-block">{{ section.key }}</strong>
+                      <div *ngIf="isObject(section.value); else primitiveBlock">
+                        <div class="row">
+                          <div *ngFor="let entry of objectEntries(section.value)" class="col-12 col-md-6">
+                            <div><strong>{{ entry.key }}</strong></div>
+                            <div class="text-muted small">{{ entry.value }}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <ng-template #primitiveBlock>
+                        <div class="text-muted small">{{ section.value }}</div>
+                      </ng-template>
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-template #rawBody>
+                  <pre class="mb-0" style="white-space: pre-wrap; word-break: break-word;">{{ execution.responseBody | json }}</pre>
+                </ng-template>
               </td>
             </tr>
           </tbody>
@@ -167,8 +187,25 @@
             <tr>
               <th scope="row">Details</th>
               <td>
-                <pre class="mb-0"
-                  style="white-space: pre-wrap; word-break: break-word;">{{ selectedExecutionDetails?.responseBody | json }}</pre>
+                <ng-container *ngIf="getResponseObject(selectedExecutionDetails?.responseBody) as respObj; else rawRunBody">
+                  <div *ngFor="let section of objectEntries(respObj)" [ngClass]="{'arg-card': true, 'resp-section': true, 'metric': section.key === 'metric', 'measurement': section.key === 'measurement'}" class="mb-2">
+                    <strong class="d-block">{{ section.key }}</strong>
+                    <div *ngIf="isObject(section.value); else primitiveRunBlock">
+                      <div class="row">
+                        <div *ngFor="let entry of objectEntries(section.value)" class="col-12 col-md-6">
+                          <div><strong>{{ entry.key }}</strong></div>
+                          <div class="text-muted small">{{ entry.value }}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <ng-template #primitiveRunBlock>
+                      <div class="text-muted small">{{ section.value }}</div>
+                    </ng-template>
+                  </div>
+                </ng-container>
+                <ng-template #rawRunBody>
+                  <pre class="mb-0" style="white-space: pre-wrap; word-break: break-word;">{{ selectedExecutionDetails?.responseBody | json }}</pre>
+                </ng-template>
               </td>
             </tr>
           </tbody>
