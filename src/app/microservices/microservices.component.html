@@ -23,9 +23,14 @@
             <input type="text" class="form-control" id="url" formControlName="url"
               placeholder="Enter microservice URL" />
           </div>
-          <button type="submit" class="btn btn-primary" [disabled]="microserviceForm.invalid">
-            Register Microservice
-          </button>
+          <div class="d-flex justify-content-between mt-3">
+            <button type="button" class="btn btn-outline-primary" aria-label="Close" (click)="modal.dismiss()">
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="microserviceForm.invalid">
+              Register Microservice
+            </button>
+          </div>
         </form>
       </div>
     </ng-template>
