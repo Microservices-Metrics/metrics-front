@@ -1,21 +1,61 @@
-
 <main class="container">
-    <div class="bg-body-tertiary p-5 rounded mt-3">
-      <h1>New metric type</h1>
-      <p class="lead">
-        Create a new metric type. For example: API Descriptors, Static (from Code) etc.
-      </p>
-      <form>
-        <div class="mb-3">
-          <label for="serviceName" class="form-label">Metric Type</label>
-          <input type="text" class="form-control" />
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Description</label>
-          <input type="text" class="form-control" />
-        </div>
-        <button type="submit" class="btn btn-primary">Create</button>
-      </form>
-    </div>
-  </main>
-  
+  <div class="bg-body-tertiary p-5 rounded mt-3">
+    <h1>New Metric</h1>
+    <p class="fs-6">
+      Create a new metric. For example: Number of endpoints, connections to database, etc.
+    </p>
+
+    <button class="btn btn-primary" (click)="openModal()">New Collector</button>
+
+    <ng-template #modalContent let-modal>
+      <div class="bg-body-tertiary p-5 rounded mt-1">
+        <h2>New Collector</h2>
+        <br />
+        <form [formGroup]="metricsForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label class="form-label">Metric Name <span class="text-danger">*</span></label>
+            <input 
+              type="text" 
+              class="form-control" 
+              formControlName="name"
+              [class.is-invalid]="metricsForm.get('name')?.invalid && metricsForm.get('name')?.touched" />
+            <div class="invalid-feedback" *ngIf="metricsForm.get('name')?.invalid && metricsForm.get('name')?.touched">
+              <small *ngIf="metricsForm.get('name')?.errors?.['required']">
+                Metric name is required.
+              </small>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-control" formControlName="description" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Type <span class="text-danger">*</span></label>
+            <input 
+              type="text" 
+              class="form-control" 
+              formControlName="type"
+              [class.is-invalid]="metricsForm.get('type')?.invalid && metricsForm.get('type')?.touched" />
+            <div class="invalid-feedback" *ngIf="metricsForm.get('type')?.invalid && metricsForm.get('type')?.touched">
+              <small *ngIf="metricsForm.get('type')?.errors?.['required']">
+                Type is required.
+              </small>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Unit</label>
+            <input type="text" class="form-control" formControlName="unit" />
+          </div>
+          <div class="d-flex justify-content-between mt-3">
+            <button type="button" class="btn btn-outline-primary" aria-label="Close" (click)="modal.dismiss()">
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="!metricsForm.valid">
+              Create Metric
+            </button>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+  </div>
+</main>
