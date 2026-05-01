@@ -90,6 +90,13 @@
           <td class="d-flex gap-2">
             <button class="btn btn-outline-secondary btn-sm" (click)="openEditModal(config)">Edit</button>
             <button class="btn btn-outline-danger btn-sm" (click)="deleteConfig(config.id)">Delete</button>
+            <button class="btn btn-outline-success btn-sm" (click)="triggerCollection(config)"
+              [disabled]="triggerStatus[config.id] === 'loading'">
+              <span *ngIf="triggerStatus[config.id] === 'loading'" class="spinner-border spinner-border-sm" role="status"></span>
+              <span *ngIf="triggerStatus[config.id] !== 'loading'">Run</span>
+            </button>
+            <span *ngIf="triggerStatus[config.id] === 'success'" class="badge bg-success align-self-center">Done</span>
+            <span *ngIf="triggerStatus[config.id] === 'error'" class="badge bg-danger align-self-center">Error</span>
           </td>
         </tr>
       </tbody>
