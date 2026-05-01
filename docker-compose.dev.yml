@@ -1,0 +1,13 @@
+services:
+  front:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm ci && npm run start -- --host 0.0.0.0 --poll=1000"
+    container_name: metrics-front-dev
+    ports:
+      - "4200:4200"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
