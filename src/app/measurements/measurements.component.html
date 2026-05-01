@@ -9,23 +9,45 @@
     <form [formGroup]="filterForm" class="row g-3 align-items-end">
       <div class="col-md-4">
         <label class="form-label">Collector</label>
-        <select class="form-select" formControlName="collectorId" (change)="onCollectorChange()">
-          <option value="">All collectors</option>
-          <option *ngFor="let c of collectors" [value]="c.id">{{ c.name }}</option>
-        </select>
+        <div class="position-relative">
+          <input type="text" class="form-control"
+            [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="collectorSearch"
+            (focus)="collectorDropdownOpen = true"
+            (input)="collectorDropdownOpen = true"
+            (blur)="onCollectorBlur()"
+            placeholder="All collectors">
+          <ul class="dropdown-menu w-100" [class.show]="collectorDropdownOpen" style="max-height:220px;overflow-y:auto">
+            <li><button class="dropdown-item" (mousedown)="selectCollector(null)">All collectors</button></li>
+            <li *ngFor="let c of filteredCollectors">
+              <button class="dropdown-item" (mousedown)="selectCollector(c)">{{ c.name }}</button>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div class="col-md-4">
         <label class="form-label">Collector Config</label>
-        <select class="form-select" formControlName="collectorConfigId" (change)="onCollectorConfigChange()"
-          [disabled]="!filterForm.get('collectorId')?.value">
-          <option value="">All configs</option>
-          <option *ngFor="let cc of collectorConfigs" [value]="cc.id">{{ cc.id }}</option>
-        </select>
+        <div class="position-relative">
+          <input type="text" class="form-control"
+            [ngModelOptions]="{standalone: true}"
+            [(ngModel)]="collectorConfigSearch"
+            (focus)="collectorConfigDropdownOpen = true"
+            (input)="collectorConfigDropdownOpen = true"
+            (blur)="onCollectorConfigBlur()"
+            [disabled]="!filterForm.get('collectorId')?.value"
+            placeholder="All configs">
+          <ul class="dropdown-menu w-100" [class.show]="collectorConfigDropdownOpen && !!filterForm.get('collectorId')?.value" style="max-height:220px;overflow-y:auto">
+            <li><button class="dropdown-item" (mousedown)="selectCollectorConfig(null)">All configs</button></li>
+            <li *ngFor="let cc of filteredCollectorConfigs">
+              <button class="dropdown-item" (mousedown)="selectCollectorConfig(cc)">{{ cc.id }}</button>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div class="col-md-4 d-flex gap-2">
-        <button type="button" class="btn btn-outline-secondary" (click)="filterForm.reset({ collectorId: '', collectorConfigId: '' }); collectorConfigs = []; loadMeasurements()">
+        <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">
           Clear filters
         </button>
         <button

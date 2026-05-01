@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ManagerApiService } from '../services/manager-api.service';
+import { MetricManagerExecutionsService } from '../services/metric-manager-executions.service';
 
 // Valida expressões cron de 6 campos (Spring): segundos minutos horas dia-mês mês dia-semana
 // Cada campo aceita: *, números, intervalos (x-y), incrementos (*/x), listas (x,y), e caracteres especiais ?, L, W, #
@@ -29,11 +30,13 @@ export class CollectorConfigsComponent implements OnInit {
   microservices: any[] = [];
   editingId: string | null = null;
   configForm: FormGroup;
+  triggerStatus: Record<string, 'loading' | 'success' | 'error'> = {};
 
   constructor(
     private fb: FormBuilder,
     private modalService: NgbModal,
-    private managerApiService: ManagerApiService
+    private managerApiService: ManagerApiService,
+    private executionsService: MetricManagerExecutionsService
   ) {
     this.configForm = this.fb.group({
       collectorId: ['', Validators.required],
@@ -124,6 +127,23 @@ export class CollectorConfigsComponent implements OnInit {
     this.managerApiService.deleteCollectorConfig(id).subscribe({
       next: () => {
         this.collectorConfigs = this.collectorConfigs.filter(c => c.id !== id);
+      },
+      error: (err) => {
+        alert(`Erro ao excluir configuração: ${err?.error || err?.message || 'erro desconhecido'}`);
+      }
+    });
+  }
+
+  triggerCollection(config: any) {
+    this.triggerStatus[config.id] = 'loading';
+    this.executionsService.triggerCollection(config.collectorId, config.microserviceId).subscribe({
+      next: (res) => {
+        this.triggerStatus[config.id] = res !== null ? 'success' : 'error';
+        setTimeout(() => delete this.triggerStatus[config.id], 3000);
+      },
+      error: () => {
+        this.triggerStatus[config.id] = 'error';
+        setTimeout(() => delete this.triggerStatus[config.id], 3000);
       }
     });
   }

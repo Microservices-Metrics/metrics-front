@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of } from 'rxjs';
+import { catchError, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -184,10 +184,10 @@ export class ManagerApiService {
   }
 
   deleteCollectorConfig(id: string): Observable<any> {
-    return this.http.delete(`${this.collectorConfigsEndpoint}/${id}`).pipe(
+    return this.http.delete(`${this.collectorConfigsEndpoint}/${id}`, { responseType: 'text' }).pipe(
       catchError((err) => {
         this.error = `Erro ao excluir configuração ${id}!`;
-        return of(null);
+        return throwError(() => err);
       })
     );
   }
