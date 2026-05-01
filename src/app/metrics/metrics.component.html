@@ -1,15 +1,15 @@
 <main class="container">
   <div class="bg-body-tertiary p-5 rounded mt-3">
-    <h1>New Metric</h1>
+    <h1>Metrics</h1>
     <p class="fs-6">
       Create a new metric. For example: Number of endpoints, connections to database, etc.
     </p>
 
-    <button class="btn btn-primary" (click)="openModal()">New Collector</button>
+    <button class="btn btn-primary" (click)="openModal()">New Metric</button>
 
     <ng-template #modalContent let-modal>
       <div class="bg-body-tertiary p-5 rounded mt-1">
-        <h2>New Collector</h2>
+        <h2>New Metric</h2>
         <br />
         <form [formGroup]="metricsForm" (ngSubmit)="onSubmit()">
           <div class="mb-3">
@@ -57,5 +57,32 @@
         </form>
       </div>
     </ng-template>
+  </div>
+
+  <div class="bg-body-tertiary mt-3" *ngIf="currentMetrics.length > 0">
+    <table class="table table-striped-columns table-hover">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Unit</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let metric of currentMetrics">
+          <td>{{ metric.idMetric }}</td>
+          <td>{{ metric.name }}</td>
+          <td>{{ metric.type }}</td>
+          <td>{{ metric.unit }}</td>
+          <td>{{ metric.description }}</td>
+          <td>
+            <button class="btn btn-outline-danger btn-sm" (click)="deleteMetric(metric.idMetric)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </main>

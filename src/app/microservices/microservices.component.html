@@ -14,14 +14,11 @@
         <br />
         <form [formGroup]="microserviceForm" (ngSubmit)="onSubmit()">
           <div class="mb-3">
-            <label for="name" class="form-label">Name</label>
+            <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="name" formControlName="name"
-              placeholder="Enter microservice name" />
-          </div>
-          <div class="mb-3">
-            <label for="url" class="form-label">URL</label>
-            <input type="text" class="form-control" id="url" formControlName="url"
-              placeholder="Enter microservice URL" />
+              placeholder="Enter microservice name"
+              [class.is-invalid]="microserviceForm.get('name')?.invalid && microserviceForm.get('name')?.touched" />
+            <div class="invalid-feedback">Name is required.</div>
           </div>
           <div class="d-flex justify-content-between mt-3">
             <button type="button" class="btn btn-outline-primary" aria-label="Close" (click)="modal.dismiss()">
@@ -34,5 +31,26 @@
         </form>
       </div>
     </ng-template>
+  </div>
+
+  <div class="bg-body-tertiary mt-3" *ngIf="currentMicroservices.length > 0">
+    <table class="table table-striped-columns table-hover">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ms of currentMicroservices">
+          <td>{{ ms.id }}</td>
+          <td>{{ ms.name }}</td>
+          <td>
+            <button class="btn btn-outline-danger btn-sm" (click)="deleteMicroservice(ms.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </main>
