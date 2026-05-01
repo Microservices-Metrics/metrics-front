@@ -1,8 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ManagerApiService } from '../services/manager-api.service';
+
+// Valida expressões cron de 6 campos (Spring): segundos minutos horas dia-mês mês dia-semana
+// Cada campo aceita: *, números, intervalos (x-y), incrementos (*/x), listas (x,y), e caracteres especiais ?, L, W, #
+const CRON_FIELD = '[*0-9,\\-\\/LW#?]+';
+const CRON_REGEX = new RegExp(`^(${CRON_FIELD}\\s+){5}${CRON_FIELD}$`);
+
+export const cronValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const value: string = control.value?.trim();
+  if (!value) return null; // campo opcional — vazio é válido
+  return CRON_REGEX.test(value) ? null : { invalidCron: true };
+};
 
 @Component({
   selector: 'app-collector-configs',
@@ -27,7 +38,7 @@ export class CollectorConfigsComponent implements OnInit {
     this.configForm = this.fb.group({
       collectorId: ['', Validators.required],
       microserviceId: ['', Validators.required],
-      cronExpression: [''],
+      cronExpression: ['', cronValidator],
       startDateTime: [''],
       endDateTime: ['']
     });

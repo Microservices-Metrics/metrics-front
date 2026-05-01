@@ -1,0 +1,23 @@
+.resizable-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.resizable-table th {
+  position: relative;
+  overflow: hidden;
+  resize: horizontal;
+  min-width: 60px;
+}
+
+.resizable-table th::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 20%;
+  height: 60%;
+  width: 3px;
+  background-color: var(--bs-border-color);
+  cursor: col-resize;
+  border-radius: 2px;
+}

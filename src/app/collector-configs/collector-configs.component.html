@@ -36,7 +36,12 @@
           <div class="mb-3">
             <label class="form-label">Cron Expression</label>
             <input type="text" class="form-control" formControlName="cronExpression"
-              placeholder="e.g. 0 */5 * * * ?" />
+              placeholder="e.g. 0 */5 * * * ?"
+              [class.is-invalid]="configForm.get('cronExpression')?.invalid && configForm.get('cronExpression')?.touched" />
+            <div class="invalid-feedback">
+              Invalid cron expression. Expected 6 fields separated by spaces (e.g. <code>0 */5 * * * ?</code>).
+            </div>
+            <div class="form-text">Format: <code>seconds minutes hours day-of-month month day-of-week</code></div>
           </div>
 
           <div class="row">
@@ -62,7 +67,7 @@
   </div>
 
   <div class="bg-body-tertiary mt-3" *ngIf="collectorConfigs.length > 0">
-    <table class="table table-striped-columns table-hover">
+    <table class="table table-striped-columns table-hover resizable-table">
       <thead>
         <tr>
           <th>ID</th>
