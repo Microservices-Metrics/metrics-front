@@ -114,9 +114,7 @@ export class CollectorConfigsComponent implements OnInit {
       this.managerApiService.postCollectorConfig(payload).subscribe({
         next: (created) => {
           if (created) {
-            this.managerApiService.getCollectorConfigs().subscribe({
-              next: (data) => { this.collectorConfigs = data; }
-            });
+            this.collectorConfigs = [...this.collectorConfigs, created];
           }
           this.modalService.dismissAll();
         }
