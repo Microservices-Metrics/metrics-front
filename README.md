@@ -26,8 +26,6 @@ The app will be available at `http://localhost:4200/`. Changes to source files a
 
 ## Docker (production)
 
-## Docker (production)
-
 To build and run the production image with nginx:
 
 ```bash
