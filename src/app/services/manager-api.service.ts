@@ -55,6 +55,18 @@ export class ManagerApiService {
     );
   }
 
+  getCollectorHealthStatuses(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.collectorsEndpoint}/health`).pipe(
+      catchError(() => of([]))
+    );
+  }
+
+  getCollectorHealth(id: string): Observable<any> {
+    return this.http.get<any>(`${this.collectorsEndpoint}/${id}/health`).pipe(
+      catchError(() => of(null))
+    );
+  }
+
   // --- Metrics ---
 
   getMetrics(): Observable<any[]> {

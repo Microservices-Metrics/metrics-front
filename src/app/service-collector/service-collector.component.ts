@@ -18,6 +18,7 @@ export class ServiceCollectorComponent {
   @ViewChild('modalDetails') modalDetails: any;
 
   currentServiceCollectors: any[] = [];
+  healthStatusMap: Record<string, string> = {};
   selectedExecutions: any[] = [];
   selectedServiceId: string | number | null = null;
   selectedServiceName: string = '';
@@ -85,6 +86,43 @@ export class ServiceCollectorComponent {
         console.error('Erro ao consumir API: ' + err);
       }
     });
+
+    this.loadHealthStatuses();
+  }
+
+  loadHealthStatuses() {
+    this.managerApiService.getCollectorHealthStatuses().subscribe({
+      next: (statuses: any[]) => {
+        const map: Record<string, string> = {};
+        for (const s of statuses) {
+          if (s?.collectorId) map[s.collectorId] = s.status ?? 'UNKNOWN';
+        }
+        this.healthStatusMap = map;
+      },
+      error: () => {}
+    });
+  }
+
+  refreshHealthStatus(collectorId: string) {
+    this.managerApiService.getCollectorHealth(collectorId).subscribe({
+      next: (s: any) => {
+        if (s?.collectorId) {
+          this.healthStatusMap = { ...this.healthStatusMap, [s.collectorId]: s.status ?? 'UNKNOWN' };
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  getHealthBadgeClass(collectorId: string): string {
+    const status = this.healthStatusMap[collectorId];
+    if (status === 'UP') return 'bg-success';
+    if (status === 'DOWN') return 'bg-danger';
+    return 'bg-secondary';
+  }
+
+  getHealthTitle(collectorId: string): string {
+    return this.healthStatusMap[collectorId] ?? 'UNKNOWN';
   }
 
   onSubmit() {
