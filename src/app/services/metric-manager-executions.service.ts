@@ -9,18 +9,18 @@ import { catchError, of, tap } from 'rxjs';
 export class MetricManagerExecutionsService {
   error: string | null = null;
 
-  private executionsEndpoint = environment.metricManagerApiUrl + '/executions';
+  private triggerEndpoint = environment.metricManagerApiUrl + '/collector-configs/trigger';
 
   constructor(private http: HttpClient) { }
 
-  postExecution(idService: string) {
-    const payload = { idService };
-    console.log('Execution request to', this.executionsEndpoint, 'payload:', payload);
+  triggerCollection(collectorId: string, microserviceId: string) {
+    const payload = { collectorId, microserviceId };
+    console.log('Trigger request to', this.triggerEndpoint, 'payload:', payload);
 
-    return this.http.post(this.executionsEndpoint, payload).pipe(
-      tap((res) => console.log('Execution response:', res)),
+    return this.http.post(this.triggerEndpoint, payload).pipe(
+      tap((res) => console.log('Trigger response:', res)),
       catchError((err) => {
-        this.error = `Não foi possível iniciar execução do serviço ${idService}! Error: ${err.message || err}`;
+        this.error = `Não foi possível iniciar coleta para o coletor ${collectorId}! Error: ${err.message || err}`;
         return of(null);
       })
     );

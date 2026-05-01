@@ -92,23 +92,23 @@ export class ServiceCollectorComponent {
       const raw = this.serviceCollectorForm.value;
       const body: any = {
         name: raw.name,
-        type: raw.type,
-        url: raw.url,
-        collectionSettings: raw.collectionSettings || {},
-        metricFormat: raw.metricFormat,
-        metricDescription: raw.metricDescription,
-        arguments: (raw.arguments || []).map((a: any) => ({
-          argumentName: a.argumentName,
-          argumentValue: a.argumentValue,
-          type: a.type,
-          description: a.description
-        }))
+        description: raw.metricDescription,
+        collectionMethod: raw.type,
+        metadata: (raw.arguments || [])
+          .filter((a: any) => a.argumentName)
+          .map((a: any) => ({
+            keyName: a.argumentName,
+            keyValue: a.argumentValue
+          }))
       };
 
       console.log('Request body:', body);
 
       this.managerApiService.postCollector(body).subscribe({
-        next: () => {
+        next: (created) => {
+          if (created) {
+            this.currentServiceCollectors = [...this.currentServiceCollectors, created];
+          }
           this.serviceCollectorForm.reset();
           this.arguments.clear();
           this.addArgument();
@@ -136,11 +136,11 @@ export class ServiceCollectorComponent {
     }
   }
 
-  deleteServiceCollector(idService: string) {
+  deleteServiceCollector(id: string) {
     if (confirm('Tem certeza que deseja excluir este coletor de serviços?')) {
-      this.managerApiService.deleteCollector(idService).subscribe({
+      this.managerApiService.deleteCollector(id).subscribe({
         next: () => {
-          this.currentServiceCollectors = this.currentServiceCollectors.filter(collector => collector.idService !== idService);
+          this.currentServiceCollectors = this.currentServiceCollectors.filter(collector => collector.id !== id);
           console.log('Coletor de serviços excluído com sucesso!');
         },
         error: (err) => {
@@ -175,29 +175,36 @@ export class ServiceCollectorComponent {
     );
   }
 
-  runServiceCollector(idService: string) {
-    this.metricManagerExecutionsService.postExecution(idService).subscribe({
-      next: (response) => {
-        console.log('Coletor de serviços iniciado com sucesso:', response);
-        this.selectedExecutionDetails = response;
+  runServiceCollector(collector: any) {
+    const collectorId = collector?.id;
+    const microserviceId = collector?.configs?.[0]?.microserviceId;
 
-        this.modalService.open(this.modalRunService, { size: 'lg' }).result.then(
-          (res) => console.log('Run modal closed', res),
-          (reason) => console.log('Run modal dismissed', reason)
-        );
+    if (!collectorId) {
+      alert('ID do coletor não encontrado.');
+      return;
+    }
+    if (!microserviceId) {
+      alert('Nenhuma configuração de coletor com microsserviço encontrada. Adicione uma CollectorConfig antes de executar.');
+      return;
+    }
+
+    this.metricManagerExecutionsService.triggerCollection(collectorId, microserviceId).subscribe({
+      next: (response) => {
+        console.log('Coleta iniciada com sucesso para o coletor:', collectorId);
+        alert('Coleta iniciada com sucesso!');
       },
       error: (err) => {
-        console.error('Erro ao iniciar coletor de serviços:', err);
+        console.error('Erro ao iniciar coleta:', err);
       }
     });
   }
 
   openHistory(collector: any) {
-    const id = collector?.idService ?? collector?.id ?? null;
+    const id = collector?.id ?? null;
     if (!id) {
-      // fallback para dados existentes se nenhum idService estiver disponível
+      // fallback para dados existentes se nenhum id estiver disponível
       this.selectedExecutions = Array.isArray(collector?.executions) ? collector.executions : [];
-      this.selectedServiceId = collector?.idService ?? null;
+      this.selectedServiceId = null;
       this.selectedServiceName = collector?.name ?? '';
 
       this.modalService.open(this.modalHistory, { size: 'xl' }).result.then(
@@ -213,11 +220,11 @@ export class ServiceCollectorComponent {
       next: (freshCollector) => {
         const executions = Array.isArray(freshCollector?.executions) ? freshCollector.executions : (Array.isArray(collector?.executions) ? collector.executions : []);
         this.selectedExecutions = executions;
-        this.selectedServiceId = freshCollector?.idService ?? freshCollector?.id ?? id;
+        this.selectedServiceId = freshCollector?.id ?? id;
         this.selectedServiceName = freshCollector?.name ?? collector?.name ?? '';
 
         // atualizar o coletor em currentServiceCollectors para que reflita as últimas execuções
-        const idx = this.currentServiceCollectors.findIndex(c => (c.idService ?? c.id) == (freshCollector?.idService ?? freshCollector?.id ?? id));
+        const idx = this.currentServiceCollectors.findIndex(c => c.id == (freshCollector?.id ?? id));
         if (idx !== -1) {
           // merge para preservar outros campos mas atualizar execuções
           this.currentServiceCollectors[idx] = { ...this.currentServiceCollectors[idx], ...freshCollector };
@@ -232,7 +239,7 @@ export class ServiceCollectorComponent {
         console.error('Erro ao atualizar coletor para histórico:', err);
 
         this.selectedExecutions = Array.isArray(collector?.executions) ? collector.executions : [];
-        this.selectedServiceId = collector?.idService ?? null;
+        this.selectedServiceId = collector?.id ?? null;
         this.selectedServiceName = collector?.name ?? '';
         this.modalService.open(this.modalHistory, { size: 'xl' }).result.then(
           (result: any) => console.log('History modal closed', result),
