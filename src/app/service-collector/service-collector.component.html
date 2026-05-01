@@ -230,6 +230,7 @@
           <th>Name</th>
           <th>Collection Method</th>
           <th>Description</th>
+          <th>Health</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -241,6 +242,15 @@
           <td>{{ collector.name }}</td>
           <td>{{ collector.collectionMethod }}</td>
           <td>{{ collector.description }}</td>
+          <td class="text-center">
+            <span
+              class="d-inline-block rounded-circle"
+              [class]="getHealthBadgeClass(collector.id)"
+              [title]="getHealthTitle(collector.id)"
+              style="width:14px;height:14px;cursor:pointer;"
+              (click)="refreshHealthStatus(collector.id)">
+            </span>
+          </td>
           <td>
             <div class="d-flex gap-1">
               <button class="btn btn-outline-primary" (click)="runServiceCollector(collector)">Run</button>
