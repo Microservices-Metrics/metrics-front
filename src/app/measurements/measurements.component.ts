@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ManagerApiService } from '../services/manager-api.service';
 
 @Component({
   selector: 'app-measurements',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './measurements.component.html',
   styleUrl: './measurements.component.css'
 })
@@ -15,6 +15,20 @@ export class MeasurementsComponent implements OnInit {
   collectorConfigs: any[] = [];
   filterForm: FormGroup;
   loading = false;
+  collectorSearch = '';
+  collectorDropdownOpen = false;
+  collectorConfigSearch = '';
+  collectorConfigDropdownOpen = false;
+
+  get filteredCollectors() {
+    const search = this.collectorSearch.toLowerCase();
+    return search ? this.collectors.filter(c => c.name.toLowerCase().includes(search)) : this.collectors;
+  }
+
+  get filteredCollectorConfigs() {
+    const search = this.collectorConfigSearch.toLowerCase();
+    return search ? this.collectorConfigs.filter(cc => cc.id.toLowerCase().includes(search)) : this.collectorConfigs;
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -39,17 +53,17 @@ export class MeasurementsComponent implements OnInit {
     });
   }
 
-  onCollectorChange() {
-    const collectorId = this.filterForm.get('collectorId')?.value;
-    this.filterForm.patchValue({ collectorConfigId: '' });
+  selectCollector(collector: any | null) {
+    this.filterForm.patchValue({ collectorId: collector?.id ?? '', collectorConfigId: '' });
+    this.collectorSearch = collector?.name ?? '';
+    this.collectorConfigSearch = '';
     this.collectorConfigs = [];
+    this.collectorDropdownOpen = false;
 
-    if (collectorId) {
-      this.managerApiService.getCollectorById(collectorId).subscribe({
-        next: (collector) => {
-          if (collector?.configs) {
-            this.collectorConfigs = collector.configs;
-          }
+    if (collector) {
+      this.managerApiService.getCollectorById(collector.id).subscribe({
+        next: (c) => {
+          if (c?.configs) this.collectorConfigs = c.configs;
         }
       });
     }
@@ -57,7 +71,35 @@ export class MeasurementsComponent implements OnInit {
     this.loadMeasurements();
   }
 
-  onCollectorConfigChange() {
+  onCollectorBlur() {
+    setTimeout(() => {
+      this.collectorDropdownOpen = false;
+      const id = this.filterForm.get('collectorId')?.value;
+      this.collectorSearch = this.collectors.find(c => c.id === id)?.name ?? '';
+    }, 200);
+  }
+
+  selectCollectorConfig(config: any | null) {
+    this.filterForm.patchValue({ collectorConfigId: config?.id ?? '' });
+    this.collectorConfigSearch = config?.id ?? '';
+    this.collectorConfigDropdownOpen = false;
+    this.loadMeasurements();
+  }
+
+  onCollectorConfigBlur() {
+    setTimeout(() => {
+      this.collectorConfigDropdownOpen = false;
+      this.collectorConfigSearch = this.filterForm.get('collectorConfigId')?.value ?? '';
+    }, 200);
+  }
+
+  clearFilters() {
+    this.collectorSearch = '';
+    this.collectorConfigSearch = '';
+    this.collectorDropdownOpen = false;
+    this.collectorConfigDropdownOpen = false;
+    this.filterForm.reset({ collectorId: '', collectorConfigId: '' });
+    this.collectorConfigs = [];
     this.loadMeasurements();
   }
 
