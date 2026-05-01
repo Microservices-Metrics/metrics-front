@@ -226,32 +226,27 @@
     <table class="table table-stripped-columns table-hover">
       <thead>
         <tr>
-          <th>Service ID</th>
-          <th>Service Name</th>
-          <th>Collector Type</th>
-          <th>URL</th>
-          <th>Metric Format</th>
-          <th>Metric Description</th>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Collection Method</th>
+          <th>Description</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let collector of currentServiceCollectors">
           <td class="d-flex align-items-center gap-2">
-            <a href="#" class="link-primary" (click)="openDetails(collector); $event.preventDefault()">{{ collector.idService }}</a>
-            <!-- <button class="btn btn-outline-info btn-sm" title="Details" (click)="openDetails(collector)" aria-label="Details">ⓘ</button> -->
+            <a href="#" class="link-primary" (click)="openDetails(collector); $event.preventDefault()">{{ collector.id }}</a>
           </td>
           <td>{{ collector.name }}</td>
-          <td>{{ collector.type }}</td>
-          <td>{{ collector.url }}</td>
-          <td>{{ collector.metricFormat }}</td>
-          <td>{{ collector.metricDescription }}</td>
+          <td>{{ collector.collectionMethod }}</td>
+          <td>{{ collector.description }}</td>
           <td>
             <div class="d-flex gap-1">
-              <button class="btn btn-outline-primary" (click)="runServiceCollector(collector.idService)">Run</button>
+              <button class="btn btn-outline-primary" (click)="runServiceCollector(collector)">Run</button>
               <button class="btn btn-outline-success" (click)="openHistory(collector)">History</button>
               <button class="btn btn-outline-danger"
-                (click)="deleteServiceCollector(collector.idService)">Delete</button>
+                (click)="deleteServiceCollector(collector.id)">Delete</button>
             </div>
           </td>
         </tr>
@@ -266,58 +261,45 @@
         <table class="table table-sm">
           <tbody>
             <tr>
-              <th scope="row">Service ID</th>
-              <td>{{ selectedCollectorDetails?.idService }}</td>
+              <th scope="row">ID</th>
+              <td>{{ selectedCollectorDetails?.id }}</td>
             </tr>
             <tr>
               <th scope="row">Name</th>
               <td>{{ selectedCollectorDetails?.name }}</td>
             </tr>
             <tr>
-              <th scope="row">Type</th>
-              <td>{{ selectedCollectorDetails?.type }}</td>
+              <th scope="row">Collection Method</th>
+              <td>{{ selectedCollectorDetails?.collectionMethod }}</td>
             </tr>
             <tr>
-              <th scope="row">URL</th>
-              <td>{{ selectedCollectorDetails?.url }}</td>
+              <th scope="row">Description</th>
+              <td>{{ selectedCollectorDetails?.description }}</td>
             </tr>
             <tr>
-              <th scope="row">Metric Format</th>
-              <td>{{ selectedCollectorDetails?.metricFormat }}</td>
+              <th scope="row">Metric ID</th>
+              <td>{{ selectedCollectorDetails?.metricId }}</td>
             </tr>
             <tr>
-              <th scope="row">Metric Description</th>
-              <td>{{ selectedCollectorDetails?.metricDescription }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Output Example</th>
+              <th scope="row">Configs</th>
               <td>
                 <pre class="mb-0"
-                  style="white-space: pre-wrap; word-break: break-word;">{{ selectedCollectorDetails?.outputExample }}</pre>
+                  style="white-space: pre-wrap; word-break: break-word;">{{ selectedCollectorDetails?.configs | json }}</pre>
               </td>
             </tr>
             <tr>
-              <th scope="row">Collection Settings</th>
+              <th scope="row">Metadata</th>
               <td>
-                <pre class="mb-0"
-                  style="white-space: pre-wrap; word-break: break-word;">{{ selectedCollectorDetails?.collectionSettings | json }}</pre>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">Arguments</th>
-              <td>
-                <div *ngIf="selectedCollectorDetails?.arguments?.length > 0; else noArgs">
-                  <div *ngFor="let arg of selectedCollectorDetails.arguments" class="arg-card mb-2">
+                <div *ngIf="selectedCollectorDetails?.metadata?.length > 0; else noArgs">
+                  <div *ngFor="let md of selectedCollectorDetails.metadata" class="arg-card mb-2">
                     <div class="row">
-                      <div class="col-12 col-md-3"><strong>Name</strong><div>{{ arg.argumentName || arg.name || '-' }}</div></div>
-                      <div class="col-12 col-md-2"><strong>Type</strong><div>{{ arg.type || '-' }}</div></div>
-                      <div class="col-12 col-md-4"><strong>Value</strong><div>{{ arg.argumentValue || arg.value || '-' }}</div></div>
-                      <div class="col-12 col-md-3"><strong>Description</strong><div>{{ arg.description || '-' }}</div></div>
+                      <div class="col-12 col-md-6"><strong>Key</strong><div>{{ md.keyName || '-' }}</div></div>
+                      <div class="col-12 col-md-6"><strong>Value</strong><div>{{ md.keyValue || '-' }}</div></div>
                     </div>
                   </div>
                 </div>
                 <ng-template #noArgs>
-                  <p class="text-muted mb-0">No arguments defined for this collector.</p>
+                  <p class="text-muted mb-0">No metadata defined for this collector.</p>
                 </ng-template>
               </td>
             </tr>

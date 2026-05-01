@@ -12,6 +12,30 @@ ng serve
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
+## Docker (development with hot reload)
+
+To run the application in Docker with hot reload enabled, use:
+
+```bash
+docker compose -f docker-compose.dev.yml up
+```
+
+The app will be available at `http://localhost:4200/`. Changes to source files are automatically detected and the browser reloads — no rebuild needed.
+
+> **Note:** `--poll=1000` is used so Angular detects file changes via polling, which is required on Windows where filesystem events are not propagated through Docker volumes.
+
+## Docker (production)
+
+## Docker (production)
+
+To build and run the production image with nginx:
+
+```bash
+docker compose up --build -d
+```
+
+The app will be available at `http://localhost:4200/`.
+
 ## Code scaffolding
 
 Angular CLI includes powerful code scaffolding tools. To generate a new component, run:

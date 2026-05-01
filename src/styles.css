@@ -8,3 +8,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+table {
+  font-size: 0.85rem;
+}

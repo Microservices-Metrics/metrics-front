@@ -1,0 +1,83 @@
+<main class="container">
+  <div class="bg-body-tertiary p-5 rounded mt-3">
+    <h1>Measurements</h1>
+    <p class="lead">
+      Measurements are the collected metric values from your microservices. Filter by collector or collector config to
+      narrow the results.
+    </p>
+
+    <form [formGroup]="filterForm" class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">Collector</label>
+        <select class="form-select" formControlName="collectorId" (change)="onCollectorChange()">
+          <option value="">All collectors</option>
+          <option *ngFor="let c of collectors" [value]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Collector Config</label>
+        <select class="form-select" formControlName="collectorConfigId" (change)="onCollectorConfigChange()"
+          [disabled]="!filterForm.get('collectorId')?.value">
+          <option value="">All configs</option>
+          <option *ngFor="let cc of collectorConfigs" [value]="cc.id">{{ cc.id }}</option>
+        </select>
+      </div>
+
+      <div class="col-md-4 d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary" (click)="filterForm.reset({ collectorId: '', collectorConfigId: '' }); collectorConfigs = []; loadMeasurements()">
+          Clear filters
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-danger"
+          [disabled]="!filterForm.get('collectorId')?.value && !filterForm.get('collectorConfigId')?.value"
+          (click)="deleteByFilter()">
+          Delete filtered
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="mt-3" *ngIf="loading">
+    <p class="text-muted">Loading measurements...</p>
+  </div>
+
+  <div class="bg-body-tertiary mt-3" *ngIf="!loading && measurements.length === 0">
+    <p class="p-4 text-muted">No measurements found for the selected filters.</p>
+  </div>
+
+  <div class="bg-body-tertiary mt-3" *ngIf="!loading && measurements.length > 0">
+    <table class="table table-striped-columns table-hover">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Collector Config</th>
+          <th>Timestamp</th>
+          <th>Status</th>
+          <th>Metric Value</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let m of measurements">
+          <td class="text-truncate" style="max-width: 160px;" [title]="m.id">{{ m.id }}</td>
+          <td class="text-truncate" style="max-width: 160px;" [title]="m.collectorConfigId">{{ m.collectorConfigId }}</td>
+          <td>{{ m.startTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
+          <td>
+            <span class="badge"
+              [class.bg-success]="m.responseStatus === '200'"
+              [class.bg-danger]="m.responseStatus !== '200'"
+              [class.bg-secondary]="!m.responseStatus">
+              {{ m.responseStatus || 'N/A' }}
+            </span>
+          </td>
+          <td>{{ m.metricValue ?? '—' }}</td>
+          <td>
+            <button class="btn btn-outline-danger btn-sm" (click)="deleteMeasurement(m.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
