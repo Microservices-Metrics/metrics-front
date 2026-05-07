@@ -34,7 +34,7 @@
   </div>
 
   <div class="bg-body-tertiary mt-3" *ngIf="currentMicroservices.length > 0">
-    <table class="table table-striped-columns table-hover">
+    <table class="table table-striped-columns table-hover ms-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -44,7 +44,9 @@
       </thead>
       <tbody>
         <tr *ngFor="let ms of currentMicroservices">
-          <td>{{ ms.id }}</td>
+          <td>
+            <a href="javascript:void(0)" (click)="openDetailsModal(ms)">{{ ms.id }}</a>
+          </td>
           <td>{{ ms.name }}</td>
           <td>
             <button class="btn btn-outline-danger btn-sm" (click)="deleteMicroservice(ms.id)">Delete</button>
@@ -54,3 +56,75 @@
     </table>
   </div>
 </main>
+
+<ng-template #detailsModalContent let-modal>
+  <div class="bg-body-tertiary p-5 rounded mt-1">
+    <h2 id="details-modal-title">Microservice Details</h2>
+    <br />
+    <dl class="row" *ngIf="selectedMicroservice">
+      <dt class="col-sm-4">ID</dt>
+      <dd class="col-sm-8">{{ selectedMicroservice.id }}</dd>
+      <dt class="col-sm-4">Name</dt>
+      <dd class="col-sm-8">{{ selectedMicroservice.name }}</dd>
+    </dl>
+
+    <h5 class="mt-3">Metadata</h5>
+    <p *ngIf="selectedMicroserviceMetadatas.length === 0" class="text-muted">No metadata found.</p>
+    <table *ngIf="selectedMicroserviceMetadatas.length > 0" class="table table-sm table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Value</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let meta of selectedMicroserviceMetadatas">
+          <ng-container *ngIf="editingMetadataId === meta.id; else readRow">
+            <td>
+              <input type="text" class="form-control form-control-sm" [formControl]="$any(editMetadataForm.get('varName'))"
+                [class.is-invalid]="editMetadataForm.get('varName')?.invalid && editMetadataForm.get('varName')?.touched" />
+            </td>
+            <td>
+              <input type="text" class="form-control form-control-sm" [formControl]="$any(editMetadataForm.get('varValue'))"
+                [class.is-invalid]="editMetadataForm.get('varValue')?.invalid && editMetadataForm.get('varValue')?.touched" />
+            </td>
+            <td class="text-nowrap">
+              <button class="btn btn-success btn-sm me-1" (click)="saveMetadata(meta)" [disabled]="editMetadataForm.invalid">Save</button>
+              <button class="btn btn-outline-secondary btn-sm" (click)="cancelEditingMetadata()">Cancel</button>
+            </td>
+          </ng-container>
+          <ng-template #readRow>
+            <td>{{ meta.varName }}</td>
+            <td>{{ meta.varValue }}</td>
+            <td class="text-nowrap">
+              <button class="btn btn-outline-primary btn-sm me-1" (click)="startEditingMetadata(meta)">Edit</button>
+              <button class="btn btn-outline-danger btn-sm" (click)="deleteMetadata(meta.id)">Delete</button>
+            </td>
+          </ng-template>
+        </tr>
+      </tbody>
+    </table>
+
+    <h6 class="mt-3">Add Metadata</h6>
+    <form [formGroup]="metadataForm" (ngSubmit)="addMetadata()" class="row g-2 align-items-end">
+      <div class="col">
+        <label class="form-label form-label-sm">Variable <span class="text-danger">*</span></label>
+        <input type="text" class="form-control form-control-sm" formControlName="varName" placeholder="Variable name"
+          [class.is-invalid]="metadataForm.get('varName')?.invalid && metadataForm.get('varName')?.touched" />
+      </div>
+      <div class="col">
+        <label class="form-label form-label-sm">Value <span class="text-danger">*</span></label>
+        <input type="text" class="form-control form-control-sm" formControlName="varValue" placeholder="Value"
+          [class.is-invalid]="metadataForm.get('varValue')?.invalid && metadataForm.get('varValue')?.touched" />
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm" [disabled]="metadataForm.invalid">Add</button>
+      </div>
+    </form>
+
+    <div class="d-flex justify-content-end mt-4">
+      <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss()">Close</button>
+    </div>
+  </div>
+</ng-template>

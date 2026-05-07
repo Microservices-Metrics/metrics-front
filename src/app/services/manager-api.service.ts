@@ -12,6 +12,7 @@ export class ManagerApiService {
   private collectorsEndpoint = environment.metricManagerApiUrl + '/collectors';
   private metricsEndpoint = environment.metricManagerApiUrl + '/metrics';
   private microservicesEndpoint = environment.metricManagerApiUrl + '/microservices';
+  private microserviceMetadatasEndpoint = environment.metricManagerApiUrl + '/microservice-metadatas';
   private measurementsEndpoint = environment.metricManagerApiUrl + '/measurements';
   private collectorConfigsEndpoint = environment.metricManagerApiUrl + '/collector-configs';
 
@@ -120,6 +121,42 @@ export class ManagerApiService {
     return this.http.delete(`${this.microservicesEndpoint}/${id}`).pipe(
       catchError((err) => {
         this.error = `Erro ao excluir microsserviço ${id}!`;
+        return of(null);
+      })
+    );
+  }
+
+  getMetadatasByMicroservice(microserviceId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.microserviceMetadatasEndpoint}/microservice/${microserviceId}`).pipe(
+      catchError((err) => {
+        this.error = `Erro ao carregar metadados do microsserviço ${microserviceId}!`;
+        return of([]);
+      })
+    );
+  }
+
+  postMetadata(data: { microserviceId: string; varName: string; varValue: string }): Observable<any> {
+    return this.http.post(this.microserviceMetadatasEndpoint, data).pipe(
+      catchError((err) => {
+        this.error = 'Erro ao criar metadado!';
+        return of(null);
+      })
+    );
+  }
+
+  putMetadata(id: string, data: { varName: string; varValue: string }): Observable<any> {
+    return this.http.put(`${this.microserviceMetadatasEndpoint}/${id}`, data).pipe(
+      catchError((err) => {
+        this.error = `Erro ao atualizar metadado ${id}!`;
+        return of(null);
+      })
+    );
+  }
+
+  deleteMetadata(id: string): Observable<any> {
+    return this.http.delete(`${this.microserviceMetadatasEndpoint}/${id}`).pipe(
+      catchError((err) => {
+        this.error = `Erro ao excluir metadado ${id}!`;
         return of(null);
       })
     );
