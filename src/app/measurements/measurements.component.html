@@ -88,8 +88,8 @@
           <td>{{ m.startTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
           <td>
             <span class="badge"
-              [class.bg-success]="m.responseStatus === '200'"
-              [class.bg-danger]="m.responseStatus !== '200'"
+              [class.bg-success]="m.responseStatus === '200 OK'"
+              [class.bg-danger]="m.responseStatus !== '200 OK'"
               [class.bg-secondary]="!m.responseStatus">
               {{ m.responseStatus || 'N/A' }}
             </span>
