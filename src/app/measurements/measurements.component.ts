@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ManagerApiService } from '../services/manager-api.service';
 
 @Component({
@@ -10,15 +11,25 @@ import { ManagerApiService } from '../services/manager-api.service';
   styleUrl: './measurements.component.css'
 })
 export class MeasurementsComponent implements OnInit {
+  @ViewChild('measurementModal') measurementModal: any;
+
   measurements: any[] = [];
   collectors: any[] = [];
   collectorConfigs: any[] = [];
+  allCollectorConfigs: any[] = [];
+  microservices: any[] = [];
   filterForm: FormGroup;
   loading = false;
   collectorSearch = '';
   collectorDropdownOpen = false;
   collectorConfigSearch = '';
   collectorConfigDropdownOpen = false;
+  tableIdSearch = '';
+  tableCollectorSearch = '';
+  tableMicroserviceSearch = '';
+  tableCollectorConfigSearch = '';
+  headerFilterOpen: 'id' | 'collector' | 'microservice' | 'collectorConfig' | null = null;
+  selectedMeasurement: any = null;
 
   get filteredCollectors() {
     const search = this.collectorSearch.toLowerCase();
@@ -30,8 +41,28 @@ export class MeasurementsComponent implements OnInit {
     return search ? this.collectorConfigs.filter(cc => cc.id.toLowerCase().includes(search)) : this.collectorConfigs;
   }
 
+  get filteredMeasurements() {
+    const idSearch = this.tableIdSearch.trim().toLowerCase();
+    const collectorSearch = this.tableCollectorSearch.trim().toLowerCase();
+    const microserviceSearch = this.tableMicroserviceSearch.trim().toLowerCase();
+    const collectorConfigSearch = this.tableCollectorConfigSearch.trim().toLowerCase();
+
+    return this.measurements.filter((measurement) => {
+      const measurementId = String(measurement.id ?? '').toLowerCase();
+      const collectorName = this.collectorNameForMeasurement(measurement).toLowerCase();
+      const microserviceName = this.microserviceNameForMeasurement(measurement).toLowerCase();
+      const collectorConfigId = String(measurement.collectorConfigId ?? '').toLowerCase();
+
+      return (!idSearch || measurementId.includes(idSearch))
+        && (!collectorSearch || collectorName.includes(collectorSearch))
+        && (!microserviceSearch || microserviceName.includes(microserviceSearch))
+        && (!collectorConfigSearch || collectorConfigId.includes(collectorConfigSearch));
+    });
+  }
+
   constructor(
     private fb: FormBuilder,
+    private modalService: NgbModal,
     private managerApiService: ManagerApiService
   ) {
     this.filterForm = this.fb.group({
@@ -42,15 +73,44 @@ export class MeasurementsComponent implements OnInit {
 
   ngOnInit() {
     this.loadCollectors();
+    this.loadAllCollectorConfigs();
+    this.loadMicroservices();
     this.loadMeasurements();
   }
 
   loadCollectors() {
     this.managerApiService.getCollectors().subscribe({
-      next: (data) => {
-        this.collectors = data;
-      }
+      next: (data) => { this.collectors = data; }
     });
+  }
+
+  loadAllCollectorConfigs() {
+    this.managerApiService.getCollectorConfigs().subscribe({
+      next: (data) => { this.allCollectorConfigs = data; }
+    });
+  }
+
+  loadMicroservices() {
+    this.managerApiService.getMicroservices().subscribe({
+      next: (data) => { this.microservices = data; }
+    });
+  }
+
+  collectorNameForMeasurement(m: any): string {
+    const config = this.allCollectorConfigs.find(cc => cc.id === m.collectorConfigId);
+    if (!config) return '—';
+    return this.collectors.find(c => c.id === config.collectorId)?.name ?? config.collectorId;
+  }
+
+  microserviceNameForMeasurement(m: any): string {
+    const config = this.allCollectorConfigs.find(cc => cc.id === m.collectorConfigId);
+    if (!config) return '—';
+    return this.microservices.find(ms => ms.id === config.microserviceId)?.name ?? config.microserviceId;
+  }
+
+  openMeasurementModal(m: any) {
+    this.selectedMeasurement = m;
+    this.modalService.open(this.measurementModal, { size: 'lg' });
   }
 
   selectCollector(collector: any | null) {
@@ -101,6 +161,26 @@ export class MeasurementsComponent implements OnInit {
     this.filterForm.reset({ collectorId: '', collectorConfigId: '' });
     this.collectorConfigs = [];
     this.loadMeasurements();
+  }
+
+  clearTableFilters() {
+    this.tableIdSearch = '';
+    this.tableCollectorSearch = '';
+    this.tableMicroserviceSearch = '';
+    this.tableCollectorConfigSearch = '';
+    this.headerFilterOpen = null;
+  }
+
+  toggleHeaderFilter(filter: 'id' | 'collector' | 'microservice' | 'collectorConfig') {
+    this.headerFilterOpen = this.headerFilterOpen === filter ? null : filter;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest('.measurement-header-filter')) {
+      this.headerFilterOpen = null;
+    }
   }
 
   loadMeasurements() {
@@ -157,5 +237,14 @@ export class MeasurementsComponent implements OnInit {
         this.measurements = [];
       }
     });
+  }
+
+  formatResponseBody(body: string | null | undefined): string {
+    if (!body) return '—';
+    try {
+      return JSON.stringify(JSON.parse(body), null, 2);
+    } catch {
+      return body;
+    }
   }
 }
