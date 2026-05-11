@@ -1,0 +1,23 @@
+.ms-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.ms-table th:nth-child(1),
+.ms-table td:nth-child(1) {
+  width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ms-table th:nth-child(2),
+.ms-table td:nth-child(2) {
+  width: 45%;
+}
+
+.ms-table th:nth-child(3),
+.ms-table td:nth-child(3) {
+  width: 15%;
+  text-align: center;
+}

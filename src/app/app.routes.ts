@@ -4,8 +4,10 @@ import { ServiceCollectorComponent } from './service-collector/service-collector
 import { MicroservicesComponent } from './microservices/microservices.component';
 import { CollectorConfigsComponent } from './collector-configs/collector-configs.component';
 import { MeasurementsComponent } from './measurements/measurements.component';
+import { HomeComponent } from './home/home.component';
 
 export const routes: Routes = [
+    { path: '', component: HomeComponent },
     { path: 'collector-configs', component: CollectorConfigsComponent },
     { path: 'metrics', component: MetricsComponent },
     { path: 'microservices', component: MicroservicesComponent },
