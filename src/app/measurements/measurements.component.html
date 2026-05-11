@@ -70,11 +70,95 @@
   </div>
 
   <div class="bg-body-tertiary mt-3" *ngIf="!loading && measurements.length > 0">
+    <div class="d-flex justify-content-between align-items-center px-3 pt-3 gap-2">
+      <p class="mb-0 text-muted">Showing {{ filteredMeasurements.length }} of {{ measurements.length }} measurements</p>
+      <button type="button" class="btn btn-outline-secondary btn-sm" (click)="clearTableFilters()">
+        Clear table filters
+      </button>
+    </div>
     <table class="table table-striped-columns table-hover">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Collector Config</th>
+          <th class="measurement-header-filter">
+            <div class="d-flex align-items-center justify-content-between gap-2">
+              <span class="d-flex align-items-center gap-2">
+                ID
+                <span *ngIf="tableIdSearch.trim()" class="measurement-active-filter-badge">1</span>
+              </span>
+              <button type="button" class="btn btn-link p-0 measurement-filter-toggle"
+                [class.text-primary]="headerFilterOpen === 'id'"
+                [class.measurement-filter-toggle-active]="tableIdSearch.trim()"
+                (click)="$event.stopPropagation(); toggleHeaderFilter('id')"
+                aria-label="Filter ID">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3A.5.5 0 0 1 2.5 4h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 4.5"/>
+                </svg>
+              </button>
+            </div>
+            <div class="measurement-header-filter-panel" *ngIf="headerFilterOpen === 'id'">
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="tableIdSearch" [ngModelOptions]="{standalone: true}" placeholder="Filter ID">
+            </div>
+          </th>
+          <th class="measurement-header-filter">
+            <div class="d-flex align-items-center justify-content-between gap-2">
+              <span class="d-flex align-items-center gap-2">
+                Collector
+                <span *ngIf="tableCollectorSearch.trim()" class="measurement-active-filter-badge">1</span>
+              </span>
+              <button type="button" class="btn btn-link p-0 measurement-filter-toggle"
+                [class.text-primary]="headerFilterOpen === 'collector'"
+                [class.measurement-filter-toggle-active]="tableCollectorSearch.trim()"
+                (click)="$event.stopPropagation(); toggleHeaderFilter('collector')"
+                aria-label="Filter collector">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3A.5.5 0 0 1 2.5 4h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 4.5"/>
+                </svg>
+              </button>
+            </div>
+            <div class="measurement-header-filter-panel" *ngIf="headerFilterOpen === 'collector'">
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="tableCollectorSearch" [ngModelOptions]="{standalone: true}" placeholder="Filter collector">
+            </div>
+          </th>
+          <th class="measurement-header-filter">
+            <div class="d-flex align-items-center justify-content-between gap-2">
+              <span class="d-flex align-items-center gap-2">
+                Microservice
+                <span *ngIf="tableMicroserviceSearch.trim()" class="measurement-active-filter-badge">1</span>
+              </span>
+              <button type="button" class="btn btn-link p-0 measurement-filter-toggle"
+                [class.text-primary]="headerFilterOpen === 'microservice'"
+                [class.measurement-filter-toggle-active]="tableMicroserviceSearch.trim()"
+                (click)="$event.stopPropagation(); toggleHeaderFilter('microservice')"
+                aria-label="Filter microservice">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3A.5.5 0 0 1 2.5 4h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 4.5"/>
+                </svg>
+              </button>
+            </div>
+            <div class="measurement-header-filter-panel" *ngIf="headerFilterOpen === 'microservice'">
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="tableMicroserviceSearch" [ngModelOptions]="{standalone: true}" placeholder="Filter microservice">
+            </div>
+          </th>
+          <th class="measurement-header-filter">
+            <div class="d-flex align-items-center justify-content-between gap-2">
+              <span class="d-flex align-items-center gap-2">
+                Collector Config
+                <span *ngIf="tableCollectorConfigSearch.trim()" class="measurement-active-filter-badge">1</span>
+              </span>
+              <button type="button" class="btn btn-link p-0 measurement-filter-toggle"
+                [class.text-primary]="headerFilterOpen === 'collectorConfig'"
+                [class.measurement-filter-toggle-active]="tableCollectorConfigSearch.trim()"
+                (click)="$event.stopPropagation(); toggleHeaderFilter('collectorConfig')"
+                aria-label="Filter collector config">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3A.5.5 0 0 1 2.5 4h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 4.5"/>
+                </svg>
+              </button>
+            </div>
+            <div class="measurement-header-filter-panel" *ngIf="headerFilterOpen === 'collectorConfig'">
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="tableCollectorConfigSearch" [ngModelOptions]="{standalone: true}" placeholder="Filter config">
+            </div>
+          </th>
           <th>Timestamp</th>
           <th>Status</th>
           <th>Metric Value</th>
@@ -82,24 +166,89 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let m of measurements">
-          <td class="text-truncate" style="max-width: 160px;" [title]="m.id">{{ m.id }}</td>
-          <td class="text-truncate" style="max-width: 160px;" [title]="m.collectorConfigId">{{ m.collectorConfigId }}</td>
-          <td>{{ m.startTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
-          <td>
-            <span class="badge"
-              [class.bg-success]="m.responseStatus === '200'"
-              [class.bg-danger]="m.responseStatus !== '200'"
-              [class.bg-secondary]="!m.responseStatus">
-              {{ m.responseStatus || 'N/A' }}
-            </span>
-          </td>
-          <td>{{ m.metricValue ?? '—' }}</td>
-          <td>
-            <button class="btn btn-outline-danger btn-sm" (click)="deleteMeasurement(m.id)">Delete</button>
-          </td>
-        </tr>
+        <ng-container *ngIf="filteredMeasurements.length > 0; else noFilteredRows">
+          <tr *ngFor="let m of filteredMeasurements">
+            <td class="text-truncate" style="max-width: 120px;" [title]="m.id">
+              <button class="btn btn-link p-0 text-truncate" style="max-width: 120px;" (click)="openMeasurementModal(m)">{{ m.id }}</button>
+            </td>
+            <td>{{ collectorNameForMeasurement(m) }}</td>
+            <td>{{ microserviceNameForMeasurement(m) }}</td>
+            <td class="text-truncate" style="max-width: 160px;" [title]="m.collectorConfigId">{{ m.collectorConfigId }}</td>
+            <td>{{ m.startTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
+            <td>
+              <span class="badge"
+                [class.bg-success]="m.responseStatus === '200 OK'"
+                [class.bg-danger]="m.responseStatus !== '200 OK'"
+                [class.bg-secondary]="!m.responseStatus">
+                {{ m.responseStatus || 'N/A' }}
+              </span>
+            </td>
+            <td>{{ m.metricValue ?? '—' }}</td>
+            <td>
+              <button class="btn btn-outline-danger btn-sm" (click)="deleteMeasurement(m.id)">Delete</button>
+            </td>
+          </tr>
+        </ng-container>
+        <ng-template #noFilteredRows>
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">
+              No measurements match the current table filters.
+              <div class="mt-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="clearTableFilters()">
+                  Clear table filters
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
       </tbody>
     </table>
   </div>
 </main>
+
+<ng-template #measurementModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Measurement Details</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body" *ngIf="selectedMeasurement">
+    <dl class="row">
+      <dt class="col-sm-4">ID</dt>
+      <dd class="col-sm-8 text-break">{{ selectedMeasurement.id }}</dd>
+
+      <dt class="col-sm-4">Collector</dt>
+      <dd class="col-sm-8">{{ collectorNameForMeasurement(selectedMeasurement) }}</dd>
+
+      <dt class="col-sm-4">Microservice</dt>
+      <dd class="col-sm-8">{{ microserviceNameForMeasurement(selectedMeasurement) }}</dd>
+
+      <dt class="col-sm-4">Collector Config ID</dt>
+      <dd class="col-sm-8 text-break">{{ selectedMeasurement.collectorConfigId }}</dd>
+
+      <dt class="col-sm-4">Timestamp</dt>
+      <dd class="col-sm-8">{{ selectedMeasurement.startTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</dd>
+
+      <dt class="col-sm-4">Status</dt>
+      <dd class="col-sm-8">
+        <span class="badge"
+          [class.bg-success]="selectedMeasurement.responseStatus === '200 OK'"
+          [class.bg-danger]="selectedMeasurement.responseStatus !== '200 OK'"
+          [class.bg-secondary]="!selectedMeasurement.responseStatus">
+          {{ selectedMeasurement.responseStatus || 'N/A' }}
+        </span>
+      </dd>
+
+      <dt class="col-sm-4">Metric Value</dt>
+      <dd class="col-sm-8">{{ selectedMeasurement.metricValue ?? '—' }}</dd>
+
+      <dt class="col-sm-4">Response Body</dt>
+      <dd class="col-sm-8">
+        <pre class="mb-0" style="white-space: pre-wrap; word-break: break-all; font-size: 0.85em; max-height: 300px; overflow-y: auto;">{{ formatResponseBody(selectedMeasurement.responseBody) }}</pre>
+      </dd>
+
+    </dl>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+  </div>
+</ng-template>
